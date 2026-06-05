@@ -12,13 +12,20 @@ import { existsSync, mkdirSync, readdirSync, copyFileSync, writeFileSync, rmSync
 import { join } from "node:path";
 
 const OUT = "dist-apk";
-const CLIENT_DIR = ".output/public"; // nitro/tanstack static client assets
+const CANDIDATES = [
+  ".output/public",
+  "dist/client",
+  "dist/public",
+  ".vinxi/build/client",
+  "dist",
+];
 
 console.log("→ Running production build...");
 execSync("bun run build", { stdio: "inherit" });
 
-if (!existsSync(CLIENT_DIR)) {
-  console.error(`✗ Could not find ${CLIENT_DIR}. Build output layout may have changed.`);
+let CLIENT_DIR = CANDIDATES.find((p) => existsSync(p) && readdirSync(p).some((e) => e.endsWith(".html") || e === "assets" || e === "_build"));
+if (!CLIENT_DIR) {
+  console.error(`✗ Could not find a client bundle. Tried: ${CANDIDATES.join(", ")}`);
   process.exit(1);
 }
 

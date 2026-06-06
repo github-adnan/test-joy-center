@@ -62,8 +62,9 @@ function PayPage() {
           <div className="mt-2 flex items-baseline gap-1 border-b border-border pb-3">
             <span className="text-3xl font-semibold text-foreground">₹</span>
             <input
-              inputMode="decimal"
+              inputMode="numeric"
               type="text"
+              pattern="[0-9]*"
               autoComplete="off"
               enterKeyHint="done"
               {...amountInput.inputProps}

@@ -5,6 +5,7 @@ import { PhoneShell } from "@/components/PhoneShell";
 import { MerchantAvatar } from "@/components/MerchantAvatar";
 import { Button } from "@/components/ui/button";
 import { useSettings, setDraft, getDraft } from "@/lib/payment-store";
+import { useWebViewInputValue } from "@/hooks/use-webview-input-value";
 
 export const Route = createFileRoute("/pay")({
   head: () => ({ meta: [{ title: "Send Money — PPay" }] }),
@@ -17,8 +18,10 @@ function PayPage() {
   const existing = typeof window !== "undefined" ? getDraft() : { merchantName: "", merchantUpi: "", merchantImage: "" } as any;
   const [merchant, setMerchant] = useState(existing.merchantName || settings.merchantName);
   const [upi, setUpi] = useState(existing.merchantUpi || settings.merchantUpi);
-  const [amount, setAmount] = useState<string>("");
-  const [note, setNote] = useState("");
+  const amountInput = useWebViewInputValue("", {
+    sanitize: (value) => value.replace(/\D/g, "").slice(0, 8),
+  });
+  const noteInput = useWebViewInputValue("");
 
   useEffect(() => {
     if (!existing.merchantName) {
@@ -30,6 +33,8 @@ function PayPage() {
   const image = existing.merchantImage || settings.merchantImage;
 
   const handleContinue = () => {
+    const amount = amountInput.sync();
+    const note = noteInput.sync();
     const amt = Number(amount);
     if (!amt || amt <= 0) return;
     setDraft({ amount: amt, note, merchantName: merchant, merchantUpi: upi, merchantImage: image });
@@ -55,10 +60,12 @@ function PayPage() {
           <div className="mt-2 flex items-baseline gap-1 border-b border-border pb-3">
             <span className="text-3xl font-semibold text-foreground">₹</span>
             <input
-              inputMode="decimal"
+              inputMode="numeric"
               type="text"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ""))}
+              pattern="[0-9]*"
+              autoComplete="off"
+              enterKeyHint="done"
+              {...amountInput.inputProps}
               placeholder="0"
               className="flex-1 min-w-0 bg-transparent outline-none text-4xl font-semibold tracking-tight placeholder:text-muted-foreground/40 touch-manipulation"
             />
@@ -67,7 +74,7 @@ function PayPage() {
             {quick.map((q) => (
               <button
                 key={q}
-                onClick={() => setAmount(String(q))}
+                onClick={() => amountInput.setValue(String(q))}
                 className="px-3 py-1.5 rounded-full bg-brand-soft text-brand text-xs font-medium hover:bg-brand-soft/80"
               >
                 + ₹{q}
@@ -76,8 +83,11 @@ function PayPage() {
           </div>
 
           <input
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
+            type="text"
+            autoComplete="off"
+            autoCorrect="off"
+            enterKeyHint="done"
+            {...noteInput.inputProps}
             placeholder="Add a note (optional)"
             className="mt-5 w-full text-base bg-muted/60 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-ring touch-manipulation"
           />
@@ -92,10 +102,10 @@ function PayPage() {
 
         <Button
           onClick={handleContinue}
-          disabled={!Number(amount)}
+          disabled={!Number(amountInput.value)}
           className="w-full mt-6 h-12 text-base rounded-2xl bg-brand hover:bg-brand/90 text-brand-foreground"
         >
-          Proceed to Pay {amount ? `₹${amount}` : ""}
+          Proceed to Pay {amountInput.value ? `₹${amountInput.value}` : ""}
         </Button>
       </div>
     </PhoneShell>

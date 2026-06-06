@@ -118,7 +118,7 @@
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior: none;
-    touch-action: manipulation;
+    touch-action: auto;
   }
 
   html,
@@ -139,7 +139,15 @@
   input,
   textarea,
   select {
+    -webkit-user-select: text;
+    user-select: text;
+    touch-action: auto;
     font-size: 16px;
+  }
+
+  button,
+  a {
+    touch-action: manipulation;
   }
 }
 

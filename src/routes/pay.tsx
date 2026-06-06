@@ -33,10 +33,8 @@ function PayPage() {
   const image = existing.merchantImage || settings.merchantImage;
 
   const handleContinue = () => {
-    amountInput.sync();
-    noteInput.sync();
-    const amount = amountInput.value;
-    const note = noteInput.value;
+    const amount = amountInput.sync();
+    const note = noteInput.sync();
     const amt = Number(amount);
     if (!amt || amt <= 0) return;
     setDraft({ amount: amt, note, merchantName: merchant, merchantUpi: upi, merchantImage: image });

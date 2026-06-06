@@ -8,7 +8,7 @@ import {
   type FormEvent,
 } from "react";
 
-type NativeInputElement = HTMLInputElement | HTMLTextAreaElement;
+type NativeInputElement = HTMLInputElement;
 
 interface WebViewInputOptions {
   sanitize?: (value: string) => string;

@@ -9,6 +9,9 @@ const config: CapacitorConfig = {
   webDir: "dist-apk",
   android: {
     allowMixedContent: false,
+    captureInput: false,
+    initialFocus: true,
+    webContentsDebuggingEnabled: true,
   },
   plugins: {
     Keyboard: {

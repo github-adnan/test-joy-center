@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { useSettings, setSettings, resetSettings, FAILURE_REASONS, FailureReason } from "@/lib/payment-store";
+import { useWebViewInputValue } from "@/hooks/use-webview-input-value";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Test Settings — PPay" }] }),
@@ -178,12 +179,17 @@ function ReasonRow({
 }
 
 function Field({ label, value, onChange, mono }: { label: string; value: string; onChange: (v: string) => void; mono?: boolean }) {
+  const field = useWebViewInputValue(value, { onValueChange: onChange });
+
   return (
     <label className="block">
       <span className="text-xs text-muted-foreground">{label}</span>
       <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        type="text"
+        autoComplete="off"
+        autoCorrect="off"
+        enterKeyHint="done"
+        {...field.inputProps}
         className={`mt-1 w-full text-base bg-muted/60 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-ring touch-manipulation ${mono ? "font-mono" : ""}`}
       />
     </label>

@@ -184,7 +184,7 @@ function Field({ label, value, onChange, mono }: { label: string; value: string;
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`mt-1 w-full text-sm bg-muted/60 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-ring ${mono ? "font-mono" : ""}`}
+        className={`mt-1 w-full text-base bg-muted/60 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-ring touch-manipulation ${mono ? "font-mono" : ""}`}
       />
     </label>
   );

@@ -55,12 +55,12 @@ function PayPage() {
           <div className="mt-2 flex items-baseline gap-1 border-b border-border pb-3">
             <span className="text-3xl font-semibold text-foreground">₹</span>
             <input
-              autoFocus
               inputMode="decimal"
+              type="text"
               value={amount}
               onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ""))}
               placeholder="0"
-              className="flex-1 bg-transparent outline-none text-4xl font-semibold tracking-tight placeholder:text-muted-foreground/40"
+              className="flex-1 min-w-0 bg-transparent outline-none text-4xl font-semibold tracking-tight placeholder:text-muted-foreground/40 touch-manipulation"
             />
           </div>
           <div className="mt-3 flex gap-2 flex-wrap">
@@ -79,7 +79,7 @@ function PayPage() {
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Add a note (optional)"
-            className="mt-5 w-full text-sm bg-muted/60 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-ring"
+            className="mt-5 w-full text-base bg-muted/60 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-ring touch-manipulation"
           />
         </motion.div>
 

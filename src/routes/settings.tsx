@@ -190,7 +190,7 @@ function Field({ label, value, onChange, mono }: { label: string; value: string;
         autoCorrect="off"
         enterKeyHint="done"
         {...field.inputProps}
-        className={`mt-1 w-full text-base bg-muted/60 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-ring touch-manipulation ${mono ? "font-mono" : ""}`}
+        className={`mt-1 w-full text-base bg-muted/60 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-ring ${mono ? "font-mono" : ""}`}
       />
     </label>
   );

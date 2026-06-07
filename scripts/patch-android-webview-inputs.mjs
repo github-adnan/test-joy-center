@@ -28,8 +28,6 @@ const mainActivity = `package app.lovable.paymenttester;
 
 import android.os.Bundle;
 import android.view.MotionEvent;
-import android.view.inputmethod.InputMethodManager;
-import android.content.Context;
 import android.webkit.WebView;
 
 import com.getcapacitor.BridgeActivity;
@@ -45,14 +43,8 @@ public class MainActivity extends BridgeActivity {
     webView.requestFocusFromTouch();
 
     webView.setOnTouchListener((view, event) -> {
-      if (event.getAction() == MotionEvent.ACTION_UP) {
+      if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_UP) {
         view.requestFocusFromTouch();
-        view.postDelayed(() -> {
-          InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-          if (imm != null) {
-            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-          }
-        }, 80);
       }
       return false;
     });

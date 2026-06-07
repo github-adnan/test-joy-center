@@ -67,7 +67,7 @@ function PayPage() {
               enterKeyHint="done"
               {...amountInput.inputProps}
               placeholder="0"
-              className="flex-1 min-w-0 bg-transparent outline-none text-4xl font-semibold tracking-tight placeholder:text-muted-foreground/40 touch-manipulation"
+              className="flex-1 min-w-0 bg-transparent outline-none text-4xl font-semibold tracking-tight placeholder:text-muted-foreground/40"
             />
           </div>
           <div className="mt-3 flex gap-2 flex-wrap">
@@ -89,7 +89,7 @@ function PayPage() {
             enterKeyHint="done"
             {...noteInput.inputProps}
             placeholder="Add a note (optional)"
-            className="mt-5 w-full text-base bg-muted/60 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-ring touch-manipulation"
+            className="mt-5 w-full text-base bg-muted/60 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-ring"
           />
         </motion.div>
 

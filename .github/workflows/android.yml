@@ -39,6 +39,9 @@ jobs:
       - name: Sync Capacitor
         run: bunx cap sync android
 
+      - name: Patch Android WebView input focus
+        run: node scripts/patch-android-webview-inputs.mjs
+
       - name: Build debug APK
         run: |
           cd android

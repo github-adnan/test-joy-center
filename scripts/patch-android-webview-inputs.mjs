@@ -26,30 +26,9 @@ if (!activityPath) {
 
 const mainActivity = `package app.lovable.paymenttester;
 
-import android.os.Bundle;
-import android.view.MotionEvent;
-import android.webkit.WebView;
-
 import com.getcapacitor.BridgeActivity;
 
-public class MainActivity extends BridgeActivity {
-  @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-
-    WebView webView = getBridge().getWebView();
-    webView.setFocusable(true);
-    webView.setFocusableInTouchMode(true);
-    webView.requestFocusFromTouch();
-
-    webView.setOnTouchListener((view, event) -> {
-      if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_UP) {
-        view.requestFocusFromTouch();
-      }
-      return false;
-    });
-  }
-}
+public class MainActivity extends BridgeActivity {}
 `;
 
 writeFileSync(activityPath, mainActivity);
@@ -62,4 +41,4 @@ if (existsSync(manifestPath)) {
   writeFileSync(manifestPath, patched);
 }
 
-console.log("✓ Android WebView input focus patch applied");
+console.log("✓ Android WebView input configuration sanitized");

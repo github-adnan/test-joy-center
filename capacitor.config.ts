@@ -1,5 +1,4 @@
 import type { CapacitorConfig } from "@capacitor/cli";
-import { KeyboardResize } from "@capacitor/keyboard";
 
 const config: CapacitorConfig = {
   appId: "app.lovable.paymenttester",
@@ -10,13 +9,8 @@ const config: CapacitorConfig = {
   android: {
     allowMixedContent: false,
     captureInput: false,
+    initialFocus: true,
     webContentsDebuggingEnabled: true,
-  },
-  plugins: {
-    Keyboard: {
-      resize: KeyboardResize.Body,
-      resizeOnFullScreen: true,
-    },
   },
 };
 

@@ -30,17 +30,21 @@ jobs:
       - name: Build web bundle
         run: bun run build:apk
 
-      - name: Add Android platform (if missing)
+      - name: Generate clean Android platform
         run: |
-          if [ ! -d "android" ]; then
-            bunx cap add android
-          fi
+          rm -rf android
+          bunx cap add android
 
       - name: Sync Capacitor
         run: bunx cap sync android
 
       - name: Patch Android WebView input focus
         run: node scripts/patch-android-webview-inputs.mjs
+
+      - name: Verify Android input-safe build
+        run: |
+          ! grep -R "@capacitor/keyboard\|capacitor-keyboard" -n android
+          grep -R "targetSdkVersion.*36\|targetSdk =.*36" -n android
 
       - name: Build debug APK
         run: |

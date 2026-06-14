@@ -30,11 +30,10 @@ jobs:
       - name: Build web bundle
         run: bun run build:apk
 
-      - name: Add Android platform (if missing)
+      - name: Generate clean Android platform
         run: |
-          if [ ! -d "android" ]; then
-            bunx cap add android
-          fi
+          rm -rf android
+          bunx cap add android
 
       - name: Sync Capacitor
         run: bunx cap sync android

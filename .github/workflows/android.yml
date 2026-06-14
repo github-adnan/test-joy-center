@@ -41,6 +41,11 @@ jobs:
       - name: Patch Android WebView input focus
         run: node scripts/patch-android-webview-inputs.mjs
 
+      - name: Verify Android input-safe build
+        run: |
+          ! grep -R "@capacitor/keyboard\|capacitor-keyboard" -n android
+          grep -R "targetSdkVersion.*36\|targetSdk =.*36" -n android
+
       - name: Build debug APK
         run: |
           cd android

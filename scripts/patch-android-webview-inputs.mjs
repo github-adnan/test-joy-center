@@ -53,15 +53,12 @@ if (existsSync(capacitorWebViewPath)) {
             if (characters == null || characters.length() == 0) {
                 return super.dispatchKeyEvent(event);
             }
-            String escaped = characters
-                .replace("\\", "\\\\")
-                .replace("'", "\\'")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r");
+            String encodedCharacters = org.json.JSONObject.quote(characters);
             evaluateJavascript(
                 "if (document.activeElement && 'value' in document.activeElement) {" +
-                    "document.activeElement.value = document.activeElement.value + '" + escaped + "';" +
-                    "document.activeElement.dispatchEvent(new Event('input', { bubbles: true }));" +
+                    "var input = document.activeElement;" +
+                    "input.value = input.value + " + encodedCharacters + ";" +
+                    "input.dispatchEvent(new Event('input', { bubbles: true }));" +
                 "}",
                 null
             );

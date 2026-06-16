@@ -4,6 +4,7 @@ import { join } from "node:path";
 const androidRoot = "android/app/src/main";
 const javaRoot = join(androidRoot, "java");
 const manifestPath = join(androidRoot, "AndroidManifest.xml");
+const capacitorWebViewPath = "android/capacitor/src/main/java/com/getcapacitor/CapacitorWebView.java";
 
 function findFile(dir, fileName) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -39,6 +40,42 @@ if (existsSync(manifestPath)) {
     ? manifest.replace(/android:windowSoftInputMode="[^"]*"/, 'android:windowSoftInputMode="adjustResize|stateUnspecified"')
     : manifest.replace(/(<activity\b[^>]*)(>)/, '$1\n            android:windowSoftInputMode="adjustResize|stateUnspecified"$2');
   writeFileSync(manifestPath, patched);
+}
+
+if (existsSync(capacitorWebViewPath)) {
+  const source = readFileSync(capacitorWebViewPath, "utf8");
+  const dispatchKeyEventRegex = /    @Override\n    @SuppressWarnings\("deprecation"\)\n    public boolean dispatchKeyEvent\(KeyEvent event\) \{\n[\s\S]*?\n    \}\n(?=\})/;
+  const safeDispatchKeyEvent = `    @Override
+    @SuppressWarnings("deprecation")
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_MULTIPLE && bridge != null && bridge.getConfig().isInputCaptured()) {
+            String characters = event.getCharacters();
+            if (characters == null || characters.length() == 0) {
+                return super.dispatchKeyEvent(event);
+            }
+            String escaped = characters
+                .replace("\\", "\\\\")
+                .replace("'", "\\'")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r");
+            evaluateJavascript(
+                "if (document.activeElement && 'value' in document.activeElement) {" +
+                    "document.activeElement.value = document.activeElement.value + '" + escaped + "';" +
+                    "document.activeElement.dispatchEvent(new Event('input', { bubbles: true }));" +
+                "}",
+                null
+            );
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+`;
+
+  if (!dispatchKeyEventRegex.test(source)) {
+    throw new Error("Could not patch CapacitorWebView.dispatchKeyEvent");
+  }
+
+  writeFileSync(capacitorWebViewPath, source.replace(dispatchKeyEventRegex, safeDispatchKeyEvent));
 }
 
 console.log("✓ Android WebView input configuration sanitized");

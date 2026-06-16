@@ -8,7 +8,7 @@ const config: CapacitorConfig = {
   webDir: "dist-apk",
   android: {
     allowMixedContent: false,
-    captureInput: false,
+    captureInput: true,
     initialFocus: true,
     webContentsDebuggingEnabled: true,
   },

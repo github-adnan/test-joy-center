@@ -44,6 +44,8 @@ jobs:
       - name: Verify Android input-safe build
         run: |
           ! grep -R "@capacitor/keyboard\|capacitor-keyboard" -n android
+          grep -R '"captureInput"[[:space:]]*:[[:space:]]*true' -n android/app/src/main/assets/capacitor.config.json
+          grep -R "bridge.getConfig().isInputCaptured()" -n android/capacitor/src/main/java/com/getcapacitor/CapacitorWebView.java
           grep -R "targetSdkVersion.*36\|targetSdk =.*36" -n android
 
       - name: Build debug APK

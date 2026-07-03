@@ -44,7 +44,7 @@ jobs:
       - name: Verify Android input-safe build
         run: |
           ! grep -R "@capacitor/keyboard\|capacitor-keyboard" -n android || true
-          grep -R '"captureInput"[[:space:]]*:[[:space:]]*true' -n android/app/src/main/assets/capacitor.config.json
+          ! grep -R '"captureInput"' -n android/app/src/main/assets/capacitor.config.json || (echo "captureInput must not be set" && exit 1)
           grep -R "adjustResize" -n android/app/src/main/AndroidManifest.xml
 
       - name: Build debug APK

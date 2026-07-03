@@ -1,119 +1,51 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type FocusEvent,
-  type FormEvent,
-} from "react";
-
-type NativeInputElement = HTMLInputElement;
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface WebViewInputOptions {
   sanitize?: (value: string) => string;
   onValueChange?: (value: string) => void;
-  pollMs?: number;
 }
 
+/**
+ * Simple controlled input helper. Previous versions polled and mutated
+ * `input.value` on a timer, which fought the Android IME composition
+ * cycle and froze typing inside the APK WebView. Standard React
+ * controlled inputs work reliably — keep it that way.
+ */
 export function useWebViewInputValue(initialValue = "", options: WebViewInputOptions = {}) {
-  const inputRef = useRef<NativeInputElement | null>(null);
-  const timerRef = useRef<number | null>(null);
   const sanitizeRef = useRef(options.sanitize);
-  const onValueChangeRef = useRef(options.onValueChange);
-  const latestRef = useRef(options.sanitize?.(initialValue) ?? initialValue);
-  const [value, setReactValue] = useState(latestRef.current);
+  const onChangeRef = useRef(options.onValueChange);
 
   useEffect(() => {
     sanitizeRef.current = options.sanitize;
-    onValueChangeRef.current = options.onValueChange;
-  }, [options.sanitize, options.onValueChange]);
+    onChangeRef.current = options.onValueChange;
+  });
 
-  const applyValue = useCallback((nextValue: string) => {
-    const sanitized = sanitizeRef.current?.(nextValue) ?? nextValue;
-    const input = inputRef.current;
+  const [value, setValueState] = useState(
+    () => sanitizeRef.current?.(initialValue) ?? initialValue,
+  );
 
-    if (input && input.value !== sanitized) {
-      input.value = sanitized;
-    }
-
-    if (latestRef.current !== sanitized) {
-      latestRef.current = sanitized;
-      setReactValue(sanitized);
-      onValueChangeRef.current?.(sanitized);
-    }
-
+  const setValue = useCallback((next: string) => {
+    const sanitized = sanitizeRef.current?.(next) ?? next;
+    setValueState(sanitized);
+    onChangeRef.current?.(sanitized);
     return sanitized;
   }, []);
 
-  const sync = useCallback(() => applyValue(inputRef.current?.value ?? ""), [applyValue]);
-
-  const stopPolling = useCallback(() => {
-    if (timerRef.current !== null && typeof window !== "undefined") {
-      window.clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-  }, []);
-
-  const startPolling = useCallback(() => {
-    if (typeof window === "undefined") return;
-    stopPolling();
-    timerRef.current = window.setInterval(sync, options.pollMs ?? 40);
-  }, [options.pollMs, stopPolling, sync]);
-
-  const syncFromEvent = useCallback(
-    (event: FormEvent<NativeInputElement>) => applyValue(event.currentTarget.value),
-    [applyValue],
-  );
-
-  const syncAfterNativeInput = useCallback(() => {
-    if (typeof window === "undefined") return;
-    window.requestAnimationFrame(sync);
-  }, [sync]);
-
-  const handleFocus = useCallback(
-    (_event: FocusEvent<NativeInputElement>) => {
-      sync();
-      startPolling();
-    },
-    [startPolling, sync],
-  );
-
-  const handleBlur = useCallback(
-    (_event: FocusEvent<NativeInputElement>) => {
-      sync();
-      stopPolling();
-    },
-    [stopPolling, sync],
-  );
-
+  // Keep in sync when the external initialValue changes (e.g. settings load).
   useEffect(() => {
     const sanitized = sanitizeRef.current?.(initialValue) ?? initialValue;
-    if (typeof document !== "undefined" && document.activeElement === inputRef.current) return;
-    applyValue(sanitized);
-  }, [applyValue, initialValue]);
+    setValueState((prev) => (prev === sanitized ? prev : sanitized));
+  }, [initialValue]);
 
-  useEffect(() => stopPolling, [stopPolling]);
-
-  const inputProps = useMemo(
-    () => ({
-      ref: inputRef,
-      defaultValue: latestRef.current,
-      onInput: syncFromEvent,
-      onChange: syncFromEvent,
-      onBeforeInput: syncAfterNativeInput,
-      onKeyUp: syncAfterNativeInput,
-      onFocus: handleFocus,
-      onBlur: handleBlur,
-    }),
-    [handleBlur, handleFocus, syncAfterNativeInput, syncFromEvent],
-  );
+  const sync = useCallback(() => value, [value]);
 
   return {
-    inputProps,
-    ref: inputRef,
     value,
-    setValue: applyValue,
+    setValue,
     sync,
+    inputProps: {
+      value,
+      onChange: (e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value),
+    },
   };
 }

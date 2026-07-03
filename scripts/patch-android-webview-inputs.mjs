@@ -41,37 +41,5 @@ if (existsSync(manifestPath)) {
   writeFileSync(manifestPath, patched);
 }
 
-if (existsSync(capacitorWebViewPath)) {
-  const source = readFileSync(capacitorWebViewPath, "utf8");
-  const dispatchKeyEventRegex = /    @Override\n    @SuppressWarnings\("deprecation"\)\n    public boolean dispatchKeyEvent\(KeyEvent event\) \{\n[\s\S]*?\n    \}\n(?=\})/;
-  const safeDispatchKeyEvent = `    @Override
-    @SuppressWarnings("deprecation")
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_MULTIPLE && bridge != null && bridge.getConfig().isInputCaptured()) {
-            String characters = event.getCharacters();
-            if (characters == null || characters.length() == 0) {
-                return super.dispatchKeyEvent(event);
-            }
-            String encodedCharacters = org.json.JSONObject.quote(characters);
-            evaluateJavascript(
-                "if (document.activeElement && 'value' in document.activeElement) {" +
-                    "var input = document.activeElement;" +
-                    "input.value = input.value + " + encodedCharacters + ";" +
-                    "input.dispatchEvent(new Event('input', { bubbles: true }));" +
-                "}",
-                null
-            );
-            return true;
-        }
-        return super.dispatchKeyEvent(event);
-    }
-`;
-
-  if (!dispatchKeyEventRegex.test(source)) {
-    throw new Error("Could not patch CapacitorWebView.dispatchKeyEvent");
-  }
-
-  writeFileSync(capacitorWebViewPath, source.replace(dispatchKeyEventRegex, safeDispatchKeyEvent));
-}
 
 console.log("✓ Android WebView input configuration sanitized");

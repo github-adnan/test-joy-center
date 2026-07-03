@@ -4,7 +4,6 @@ import { join } from "node:path";
 const androidRoot = "android/app/src/main";
 const javaRoot = join(androidRoot, "java");
 const manifestPath = join(androidRoot, "AndroidManifest.xml");
-const capacitorWebViewPath = "android/capacitor/src/main/java/com/getcapacitor/CapacitorWebView.java";
 
 function findFile(dir, fileName) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
